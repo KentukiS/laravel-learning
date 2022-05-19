@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 // Task 1: point the main "/" URL to the HomeController method "index"
 Route::get('/', 'App\Http\Controllers\HomeController@index');
 //Task 2: point the GET URL "/user/[name]" to the UserController method "show"
@@ -49,3 +50,12 @@ Route::get('/log-in', function () {
 // Put one code line here below
 
 // End of the /app Route Group
+
+
+//lARAVEL YOUTUBE COURCE
+use App\Http\Controllers\RestTestController;
+
+Route::resource('/rest', RestTestController::class);
+//ROUTE::resource("/rest",'App\Http\Controllers\RestTestController@index')->names('restTest');
+
+//lARAVEL YOUTUBE COURCE END
