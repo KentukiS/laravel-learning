@@ -54,8 +54,14 @@ Route::get('/log-in', function () {
 
 //lARAVEL YOUTUBE COURCE
 use App\Http\Controllers\RestTestController;
+use App\Http\Controllers\Blog\PostController;
 
 Route::resource('/rest', RestTestController::class);
-//ROUTE::resource("/rest",'App\Http\Controllers\RestTestController@index')->names('restTest');
+Route::group(['prefix' => 'blog'], function(){
+    Route::resource('posts',PostController::class)->names('blog.posts');
+});
 
+//Route::controller(PostController::class)->group(function () {
+//    Route::get('blog', 'index');
+//});
 //lARAVEL YOUTUBE COURCE END
