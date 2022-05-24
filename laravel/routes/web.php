@@ -53,23 +53,24 @@ Route::get('/log-in', function () {
 
 
 //lARAVEL YOUTUBE COURCE
-use App\Http\Controllers\RestTestController;
 use App\Http\Controllers\Blog\PostController;
+use App\Http\Controllers\Blog\Admin\CategoryController;
 
-//Route::resource('/rest', RestTestController::class);
+Auth::routes();
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
 Route::group(['prefix' => 'blog'], function(){
     Route::resource('posts',PostController::class)->names('blog.posts');
 });
 
-//Route::controller(PostController::class)->group(function () {
-//    Route::get('blog', 'index');
-//});
+//blog admin
+Route::group(['prefix' => 'admin/blog'], function(){
+    $methods = ['index','edit','store','update','create'];
+    Route::resource('categories',CategoryController::class)
+        ->only($methods)
+        ->names('blog.posts');
+});
+//blog admin end
+
+
 //lARAVEL YOUTUBE COURCE END
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
