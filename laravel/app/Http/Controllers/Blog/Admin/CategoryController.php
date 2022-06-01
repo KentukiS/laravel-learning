@@ -47,7 +47,10 @@ class CategoryController extends BaseController
      */
     public function edit($id)
     {
-        dd(__METHOD__);
+        $item = BlogCategory::findOrFail($id); // может работать некорректно с несколькими сущностями, лучше find или where
+        $categoryList = BlogCategory::all();
+        return view('blog.admin.category.edit',
+            compact('item','categoryList'));
     }
 
     /**
