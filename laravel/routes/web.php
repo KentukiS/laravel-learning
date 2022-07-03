@@ -55,8 +55,10 @@ Route::get('/log-in', function () {
 //lARAVEL YOUTUBE COURCE
 use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\Admin\CategoryController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
 
-Auth::routes();
+//Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::group(['prefix' => 'blog'], function(){
@@ -65,12 +67,39 @@ Route::group(['prefix' => 'blog'], function(){
 
 //blog admin
 Route::group(['prefix' => 'admin/blog'], function(){
-    $methods = ['index','edit','store','update','create'];
     Route::resource('categories',CategoryController::class)
-        ->only($methods)
         ->names('blog.admin.categories');
 });
 //blog admin end
+
+//auth routes
+Route::name('user.')->group(function(){
+   Route::view('/private','auth.private')->middleware('auth')->name('private');
+
+   Route::get('/login',function (){
+       if(Auth::check()){
+           return redirect(route('user.private'));
+       }
+       return view('auth.login');
+   })->name('login');
+
+    Route::post('/login',[LoginController::class,'login']);
+
+    Route::get('/logout',function(){
+        Auth::logout();
+        return redirect("/");
+    })->name('logout');
+
+    Route::get('/register',function (){
+        if(Auth::check()){
+            return redirect(route('user.private'));
+        }
+        return view('auth.register');
+    })->name('register');
+
+    Route::post('/register',[RegisterController::class,'save']);
+});
+//auth routes end
 
 
 //lARAVEL YOUTUBE COURCE END

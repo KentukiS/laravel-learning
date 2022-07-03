@@ -1,0 +1,16 @@
+### Laravel ###
+laravel/vendor/
+laravel/node_modules/
+laravel/npm-debug.log
+laravel/yarn-error.log
+laravel/storage/*.key
+.env
+laravel/.env
+laravel/.env.example
+web
+/databases/
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+README.md
