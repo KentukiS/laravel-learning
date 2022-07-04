@@ -4,27 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\AuthRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
-    public function save(Request $request){
+    public function save(AuthRequest $request){
         if(Auth::check()){
             return redirect(route('user.private'));
         }
-        $validateFields = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            "email" => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            "password" => 'required',
-        ]);
-
-        if(User::where('email',$validateFields['email'])->exists()){
-            return redirect(route('user.register'))->withErrors([
-                'email' => 'Такой юзур уже существует'
-            ]);
-        }
+        $validateFields = $request->validated();
+        $validateFields['password'] = Hash::make($validateFields['password']);
 
         $user = User::create([
             'name' => $validateFields['name'],
