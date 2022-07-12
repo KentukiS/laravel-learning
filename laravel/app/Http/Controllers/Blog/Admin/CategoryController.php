@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Blog\Admin;
 
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends BaseController
 {
@@ -25,7 +26,10 @@ class CategoryController extends BaseController
      */
     public function create()
     {
-        dd(__METHOD__);
+        $item = new BlogCategory(); // может работать некорректно с несколькими сущностями, лучше find или where
+        $categoryList = BlogCategory::all();
+        return view('blog.admin.category.edit',
+            compact('item','categoryList'));
     }
 
     /**
@@ -36,7 +40,19 @@ class CategoryController extends BaseController
      */
     public function store(Request $request)
     {
-        dd(__METHOD__);
+        $data = $request->input();
+        if(empty($data['slug'])){
+            $data['slug'] = Str::slug($data['title']);
+        }
+        $item = new BlogCategory($data);
+        $item->save();
+        if($item) {
+            return redirect()->route('blog.admin.categories.edit', [$item->id])
+                ->with(['success' => 'Успешно сохранено!']);
+        } else {
+            return back()->withErrors(['msg' => 'Ошибка сохранения'])
+                ->withInput();
+        }
     }
 
     /**
@@ -70,7 +86,7 @@ class CategoryController extends BaseController
         }
 
         $data = $request->all();
-        $result = $item
+        $result = $item //можем юзать update() вместо fill->save
             ->fill($data) //записываем данные в обьект
             ->save(); // в базу
         if($result) {
