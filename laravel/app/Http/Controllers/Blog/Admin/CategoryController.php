@@ -47,7 +47,7 @@ class CategoryController extends BaseController
      */
     public function edit($id)
     {
-        $item = BlogCategory::findOrFail($id); // может работать некорректно с несколькими сущностями, лучше find или where
+        $item = BlogCategory::query()->findOrFail($id); // может работать некорректно с несколькими сущностями, лучше find или where
         $categoryList = BlogCategory::all();
         return view('blog.admin.category.edit',
             compact('item','categoryList'));
@@ -62,7 +62,26 @@ class CategoryController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        dd(__METHOD__);
+        $item = BlogCategory::find($id);
+        if(empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
+                ->withInput();
+        }
+
+        $data = $request->all();
+        $result = $item
+            ->fill($data) //записываем данные в обьект
+            ->save(); // в базу
+        if($result) {
+            return redirect()
+                ->route('blog.admin.categories.edit',$item->id)
+                ->with(['success' => "Успешно сохранено!"]);
+        } else {
+            return back()
+                ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
+                ->withInput();
+        }
     }
 
 }
