@@ -55,6 +55,7 @@ Route::get('/log-in', function () {
 //lARAVEL YOUTUBE COURCE
 use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\Admin\CategoryController;
+use App\Http\Controllers\Blog\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 
@@ -69,6 +70,9 @@ Route::group(['prefix' => 'blog'], function(){
 Route::group(['prefix' => 'admin/blog'], function(){
     Route::resource('categories',CategoryController::class)
         ->names('blog.admin.categories');
+    Route::resource('posts',AdminPostController::class)
+        ->except(['show'])
+        ->names('blog.admin.posts');
 });
 //blog admin end
 

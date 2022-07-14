@@ -8,6 +8,14 @@ use Illuminate\Support\Str;
 
 class PostController extends BaseController
 {
+
+    private $blogPostRepository;
+    public function __construct()
+    {
+        parent:: __construct();
+
+        $this->blogPostRepository = new BlogPostRepository();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +23,8 @@ class PostController extends BaseController
      */
     public function index()
     {
-        //
+        $paginator = $this->blogPostRepository->getAllWithPaginate();
+        return view('blog.admin.posts.index',compact('paginator'));
     }
 
     /**
