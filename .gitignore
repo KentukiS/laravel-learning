@@ -1,6 +1,6 @@
 ### Laravel ###
-laravel/vendor/
-laravel/node_modules/
+laravel/vendor/*
+laravel/node_modules/*
 laravel/npm-debug.log
 laravel/yarn-error.log
 laravel/storage/*.key
@@ -8,7 +8,7 @@ laravel/storage/*.key
 laravel/.env
 laravel/.env.example
 web
-/databases/
+databases/*
 Homestead.yaml
 Homestead.json
 /.vagrant
