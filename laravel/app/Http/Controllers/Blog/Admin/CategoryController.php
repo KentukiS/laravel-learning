@@ -2,11 +2,23 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Models\BlogCategory;
+use App\Repositories\BlogCategoryRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
-class CategoryController extends Controller
+class CategoryController extends BaseController
 {
+
+    private $blogCategoryRepository;
+    public function __construct()
+    {
+        parent:: __construct();
+
+        $this->blogCategoryRepository = new BlogCategoryRepository();
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +26,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        dd(__METHOD__);
+//        $paginator = BlogCategory::paginate(5);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
+        return view('blog.admin.category.index', compact('paginator'));
     }
 
     /**
@@ -24,7 +38,10 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        dd(__METHOD__);
+        $item = new BlogCategory();
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
+        return view('blog.admin.category.edit',
+            compact('item','categoryList'));
     }
 
     /**
@@ -35,7 +52,19 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        dd(__METHOD__);
+        $data = $request->input();
+        if(empty($data['slug'])){
+            $data['slug'] = Str::slug($data['title']);
+        }
+        $item = new BlogCategory($data);
+        $item->save();
+        if($item) {
+            return redirect()->route('blog.admin.categories.edit', [$item->id])
+                ->with(['success' => 'Успешно сохранено!']);
+        } else {
+            return back()->withErrors(['msg' => 'Ошибка сохранения'])
+                ->withInput();
+        }
     }
 
     /**
@@ -44,9 +73,20 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, BlogCategoryRepository $categoryRepository)
     {
-        dd(__METHOD__);
+        //$item = BlogCategory::query()->findOrFail($id); // может работать некорректно с несколькими сущностями, лучше find или where
+        //$categoryList = BlogCategory::all();
+
+        $item = $this->blogCategoryRepository->getEdit($id);
+        if(empty($item)) {
+            abort(404);
+        }
+
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
+
+        return view('blog.admin.category.edit',
+            compact('item','categoryList'));
     }
 
     /**
@@ -58,7 +98,27 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dd(__METHOD__);
+        $item = BlogCategory::find($id);
+        if(empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
+                ->withInput();
+        }
+
+        $data = $request->all();
+        $result = $item //можем юзать update() вместо fill->save
+            ->fill($data)
+            ->save(); // в базу
+//        $item->name = $request->name;
+        if($result) {
+            return redirect()
+                ->route('blog.admin.categories.edit',$item->id)
+                ->with(['success' => "Успешно сохранено!"]);
+        } else {
+            return back()
+                ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
+                ->withInput();
+        }
     }
 
 }

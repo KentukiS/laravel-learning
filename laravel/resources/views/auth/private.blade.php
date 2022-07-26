@@ -1,0 +1,1 @@
+{{ __('Private user page') }}

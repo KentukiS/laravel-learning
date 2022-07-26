@@ -13,50 +13,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Task 1: point the main "/" URL to the HomeController method "index"
 Route::get('/', 'App\Http\Controllers\HomeController@index');
-//Task 2: point the GET URL "/user/[name]" to the UserController method "show"
 Route::get('/user/{name}', 'App\Http\Controllers\UserController@show');
-// Task 3: point the GET URL "/about" to the view
-// resources/views/pages/about.blade.php - without any controller
-// Also, assign the route name "about"
-// Put one code line here below
 Route::view('/about', 'pages.about');
-// Task 4: redirect the GET URL "log-in" to a URL "login"
-// Put one code line here below
 Route::get('/log-in', function () {
     return redirect('/login');
 });
-// Task 5: group the following route sentences below in Route::group()
-// Assign middleware "auth"
-// Put one Route Group code line here below
-
-// Tasks inside that Authenticated group:
-
-// Task 6: /app group within a group
-// Add another group for routes with prefix "app"
-// Put one Route Group code line here below
-
-// Tasks inside that /app group:
-
-
-// Task 7: point URL /app/dashboard to a "Single Action" DashboardController
-// Assign the route name "dashboard"
-// Put one Route Group code line here below
-
-
-// Task 8: Manage tasks with URL /app/tasks/***.
-// Add ONE line to assign 7 resource routes to TaskController
-// Put one code line here below
-
-// End of the /app Route Group
-
 
 //lARAVEL YOUTUBE COURCE
 use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\Admin\CategoryController;
+use App\Http\Controllers\Blog\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
 
-Auth::routes();
+//Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::group(['prefix' => 'blog'], function(){
@@ -64,13 +35,37 @@ Route::group(['prefix' => 'blog'], function(){
 });
 
 //blog admin
-Route::group(['prefix' => 'admin/blog'], function(){
-    $methods = ['index','edit','store','update','create'];
+Route::group(['prefix' => 'admin/blog','middleware' => 'isAdmin'], function(){
     Route::resource('categories',CategoryController::class)
-        ->only($methods)
-        ->names('blog.posts');
+        ->names('blog.admin.categories');
+    Route::resource('posts',AdminPostController::class)
+        ->except(['show'])
+        ->names('blog.admin.posts');
 });
 //blog admin end
+
+//auth routes
+Route::name('user.')->group(function(){
+   Route::view('/private','auth.private')->middleware('auth')->name('private');
+
+   Route::get('/login',function (){
+       return view('auth.login');
+   })->name('login');
+
+    Route::post('/login',[LoginController::class,'login']);
+
+    Route::get('/logout',function(){
+        Auth::logout();
+        return redirect("/");
+    })->name('logout');
+
+    Route::get('/register',function (){
+        return view('auth.register');
+    })->name('register');
+
+    Route::post('/register',[RegisterController::class,'save']);
+});
+//auth routes end
 
 
 //lARAVEL YOUTUBE COURCE END
